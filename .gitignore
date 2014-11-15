@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 
+
 # C extensions
 *.so
 
@@ -52,3 +53,9 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Sublime
+*.sublime-project
+*.sublime-workspace
+docs/_build/
+*.ipynb_checkpoints
