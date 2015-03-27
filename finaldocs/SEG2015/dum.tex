@@ -1,0 +1,160 @@
+\documentclass{segabs}
+\usepackage{mathrsfs,amsmath}
+
+
+% An example of defining macros
+\newcommand{\rs}[1]{\mathstrut\mbox{\scriptsize\rm #1}}
+\newcommand{\rr}[1]{\mbox{\rm #1}}
+
+\begin{document}
+
+\title{Moving between Dimensions in electromagnetic inversions}
+
+\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+
+\author{Seogi Kang\footnotemark[1], Rowan, Cockett, Lindsey Heagy and Douglas W. Oldenburg, Geophysical Inversion Facility, University of British Columbia}
+
+\footer{Example}
+\lefthead{Kang et al.}
+\righthead{Moving dimensions in EM inversions}
+
+\maketitle
+\begin{abstract}
+Electromagnetic (EM) methods are used to characterize the electrical conductivity distribution of the earth. Since EM methods consider time-varying fields, we typically treat EM in either the frequency domain (FD) or the time domain (TD). Recently, due in part to computational advances, EM geophysical surveys are increasingly being simulated and inverted in 3D. However, the availability of computational resources does not invalidate the use of lower dimensional formulations and methods, which can be useful depending on the geological complexity as well as the survey geometry. For example, we can treat the measured EM data either in TD or FD, and a progressive procedure can be used to invert these data, starting with 1D inversions, then moving to multi-dimensional inversions. As such, we require a set of tools that allow a geophysicists to easily move between dimensions and formulations of the EM problem. This is the motivation behind the open source software package SimPEG-EM which is part of a software ecosystem for Simulation and Parameter Estimation in Geophysics (SimPEG). In this presentation, we will share examples as well as our experience from creating a range of simulation and inversion tools for EM methods that span dimensions (1D, 2.5D and 3D) and apply analytic, FD and TD formulations in a consistent framework. The flexibility and consistency in our EM package allows us to be methodical so that we have the capacity to tackle a spectrum of problems in EM geophysics.
+\end{abstract}
+\renewcommand{\figdir}{Fig} % figure directory
+\section{Introduction}
+
+
+\section*{Methodology}
+\subsection*{Linearization of EM responses}
+An often-used representation for complex conductivity in the frequency domain is the Cole-Cole model \cite[]{COLE}
+\begin{eqnarray}
+  \sigma(\omega) = \sigma_{\infty} - \sigma_{\infty}\frac{\eta}{1+(1-\eta)(\imath\omega\tau)^c}.
+\end{eqnarray}
+where $\sigma_{\infty}$ is the conductivity at infinite frequency, $\eta$ is the chareability, $\tau$ is the time constant and $c$ is the frequency dependency. By applying inverse Fourier transform with time dependency, $e^{\imath\omega t}$, we have
+\begin{eqnarray}
+  \sigma(t) = \mathscr{F}^{-1}[\sigma(\omega)] = \sigma_{\infty}\delta(t) + \triangle\sigma(t)u(t)
+\end{eqnarray}
+where $\delta(t)$ is Dirac delta function, $u(t)$ is Heaviside step function and $\mathscr{F}^{-1}[\cdot]$ is inverse Fourier transform operator.
+
+Modified from \cite{routh2001}, we define our IP datum as
+\begin{eqnarray}
+  d^{IP}(t)  = F^{EM}[\sigma_{\infty}\delta(t)+\triangle\sigma(t)u(t)] - F^{EM}[\sigma_{\infty}],
+  \label{eq6}
+\end{eqnarray}
+where $F^{EM}[\cdot]$ is the forward modeling operator for the time domain EM problem. Note that this subtraction process has the additional benefit of removing EM coupling effects. This fact alone, allows us to better see regions of potential IP signal.
+
+By linearizing the first term in right-hand side of equation (\ref{eq6}) with the assumption that $\Delta \sigma \ll \sigma_{\infty}$ we obtain
+\begin{eqnarray}
+  d^{IP}(t)  \approx \frac{\partial F^{EM}}{\partial \sigma_{\infty}}\Big|_{t = t^{*}}\sigma_{\infty}\bar{\eta}(t)
+  =  \frac{\partial F^{EM}}{\partial log(\sigma_{\infty})}\Big|_{t = t^{*}}\bar{\eta}(t),
+  \label{eq7}
+\end{eqnarray}
+where $\frac{\partial F^{EM}}{\partial \sigma_{\infty}}\Big|_{t = t^{*}}$ is the sensitivity of $F^{EM}[\cdot]$ $w.r.t$ $\sigma_{\infty}$ at arbitrary time and $\bar{\eta}(t)$ is the pseudo chargeability
+\begin{eqnarray}
+  \tilde{\eta}(t) = \eta\mathscr{F}^{-1}[\frac{1}{1+(1-\eta)(\imath\omega\tau)^c}]\otimes I(t)
+\end{eqnarray}
+
+Equation (\ref{eq7}) represents a linear system of equations relating the time domain IP data to pseudo-chargeability.
+
+Clearly much of the success of the above strategy rests upon the ability to have a good estimate of the background conductivity $\sigma_{\infty}$ This is needed to generate the data and also the sensitivity function in the linear system. We have capability to efficiently carry out 3D time domain EM inversion of ATEM data (\cite{yang20143}). Before carrying out this inversion, data that are obviously contaminated with IP signal, (eg time channels with negative values) may first be winnowed. Irrespective of how well this is carried out, there may be some residual error left in the data. In synthetic cases where our background conductivity is scaled up or down by a factor, this error manifests itself as a DC shift in the $d^{IP}$ data. If the value of the shift can be estimated from the $d^{IP}$ data then the effect of the incorrect background can be removed. This motivates us to work with the $d^{IP}$ data and estimate smoothly varying background fields, which when subtracted from the $d^{IP}$ data, yield data for inversion. This procedure will work only if the scale of the perturbation from the incorrect background model is larger than the length scale of the IP signal, that is, the two signals must be separable. Our scenario is thus analagous to common works in potential fields where a background gravitational or magnetic field must be removed to reveal the anomalous field to be inverted.  Thus, in practice, we can redefine our IP datum as
+\begin{eqnarray}
+  d^{IP}_{corr}(t)  = d^{obs}(t) - F^{EM}[\sigma_{est}] - R(t) \nonumber \\
+  = d^{IP}(t) - R(t),
+  \label{eq8}
+\end{eqnarray}
+where $d^{IP}_{corr}(t)$ is corrected $d^{IP}(t)$ data, $d^{obs}(t)$ is the observed ATEM data, $\sigma_{est}$ is the estimated conductivity model from 3D ATEM inversion and $R(t)$ is the regional field due to incorrect background conductivity model.
+
+% The detailed flow of our ATEM-IP inversion is shown in Figure~\ref{fig:flowchart}.
+
+% \plot{flowchart}{width=\columnwidth}
+% {The flow chart of ATEM-IP inversion.}
+
+\subsection{Linear inversion with bound constraint}
+To set up an linear inverse problem, we rewrite equation (\ref{eq7}) as
+\begin{eqnarray}
+  Am=d,
+  \label{eq9}
+\end{eqnarray}
+where $d=d^{IP}_{i}$, $m = \bar{\eta}_i$, and $A=\frac{\partial F^{EM}}{\partial log(\sigma_{\infty})}\bigg|_{t=t^*}$.
+Our inversion methodology is based upon that described in \cite{doug1994}. The solution to the inverse problem is the model $m$ that solves the optimization problem
+\begin{eqnarray}
+  minimize \ \phi =  \phi_d(m) + \phi_m(m)\nonumber \\
+  s.t. \ 0 \le m,
+  \label{eq10}
+\end{eqnarray}
+where $\phi_d$ is a measure of data misfit, $\phi_m$ is a user defined model objective function and $\beta$ is regularization or trade-off parameter. We use the sum of the squares to measure data misfit
+\begin{eqnarray}
+  \phi_d = \| W_d(Am-d^{obs}|)\|^2_2 =
+  \sum^N_{j=1}(\frac{d^{pred}_j-d^{obs}_j}{\epsilon_j}),
+  \label{eq11}
+\end{eqnarray}
+where $N$ is the number of the observed data and $W_d$ is a diagonal data weighting matrix which contains the reciprocal of the esitmated uncertainty of each datum (
+$\epsilon_i$) on the main diagonal,  $d^{obs}$ is a vector containing the observed data, $d^{pred}$ is a vector containing calculated data from a linear equation given in equation (\ref{eq9}).
+The model objective function, $\phi_m$ is a measure of amount structure in the model and, upon minimization, will generate a smooth model this is cloe to a reference model, $m_{ref}$. We define $\phi_m$ as
+\begin{eqnarray}
+  \phi_m = \alpha_s\| W_s(m-m_{ref})\|^2_2+
+       \alpha_x\| W_x(m-m_{ref})\|^2_2+ \nonumber \\
+       \alpha_y\| W_y(m-m_{ref})\|^2_2+
+       \alpha_z\| W_z(m-m_{ref})\|^2_2,
+  \label{eq12}
+\end{eqnarray}
+where $W_s$ is a diagonal matrix, and $W_s$, $W_s$ and $W_s$ are discrete approximations of the first derivative operator in $x$, $y$ and $z$ directions, respectively. The $\alpha$'s are weighting parameters that balance the relative importance of producing small or smooth models.
+
+\section{ATEM-IP Examples}
+\subsection{Synthetic Example: Conductive and chargeable body}
+As a test example we use a conductive and chargeable body in the half-space as shown in Figure~\ref{fig:model}. The top panel of Figure~\ref{fig:model}, shows the survey geometry; there are 31 soundings in each 7 lines so that we have 217 soundings. We use a coincdent-loop system located 30 m above the surface. A step-off transmitter waveform is used and the range of the observed time channels is $10^{-2}$-$10^2$ $ms$. For the dicretization of the 3D earth, $20\times20\times20$ m core cells are used and the number of cells in the domain is $69\times69\times50 = 238050$. The size of the IP body is $80\times80\times80$ m and the top is $60$ m below the surface. In order to generate synthetic ATEM-IP data, we use the EMTDIP code developed by \cite[]{Marchant2012a}. By assuming we know the  true background conductivity model, we generated $\frac{db_z}{dt}$ responses of $EMIP$ and $EM$ data at the sounding locations. These are presented in Figure~\ref{fig:resp_ch1,resp_ch2}. Here $EMIP$ and $EM$ indicates $F^{EM}[\sigma_{\infty}\delta(t)+\triangle\sigma(t)u(t)]$ and $F^{EM}[\sigma_{\infty}]$, respectively. At the top-left panels of Figure~\ref{fig:resp_ch1,resp_ch2}a and b, we present time decaying curves for both simulations at sounding location $East=0$ and $North=0$ m. Black and blue lines indicate $EMIP$ and $EM$, respectively. In addition, we present all of synthetic responses with given survey geometry in the bottom panels of Figure~\ref{fig:resp_ch1,resp_ch2}(a) and (b), and the profile at center line in top-right panels of Figure~\ref{fig:resp_ch1,resp_ch2}a and b. After we generate these two responses, we subtract $EM$ from $EMIP$ to better recognize IP responses and set this IP datum as $d^{IP}$ (red lines). Thus, we simply have
+\begin{equation}
+  d^{IP} = EMIP - EM.
+  \label{eq14}
+\end{equation}
+We observe that the $EMIP$ and $EM$ responses are almost identical in early time channels where EM effects are dominant.  As a result, in early time channels, it is quite hard to recognize IP effects. However, by applying the EM decoupling process shown in equation (\ref{eq14}), we can clearly identify the IP responses even in early time channels.
+
+In practice, however, we might not know the exact background conductivity model. To investigate this we  generated $d^{IP}$ using incorrect background conductivity models, $2\sigma_{\infty}$ and $0.5\sigma_{\infty}$ and show the resultant $d^{IP}$ responses in Figure ~\ref{fig:syn_regional}. Compared to $d^{IP}$ from the correct conductivity model (blue line), data from incorrect conductivity models (red and gree lines) are biased as shown in Figure ~\ref{fig:syn_regional}(b). This example shows the potential need of estimating a regional  field ($R(t)$) and subtracting it from the EM decoupled data.
+
+\plot{model}{width=0.75\columnwidth, height=0.22\textheight}
+{Planal and sectional views of 3D complex conductivity model based on Cole-Cole representation. Dashed line in contours the boundary of the conductive IP body.}
+
+\multiplot{2}{resp_ch1,resp_ch2}{width=0.5\textwidth, height=0.18\textheight}
+{Responses of $EMIP$ (black line), $EM$ (blue line) at $t=6$ (a) and $t=24$ $ms$ (b). Top-left panels of (a) and (b) show time decay curves at center sounding location and dashed circles here show that corresponding time for other figures. Bottom pannels of (a) and (b) show that responses from all the sounding in the survey geometry at specific time channel and solid circles here indicate sounding locations. Red dashed line indicates the profile lines, which are shown at top-right panels of (a) and (b).}
+
+\plot{syn_regional}{width=\columnwidth}
+{$d^{IP}$ responses with correct and incorrect background conductivity models from all sounding locations (a) and the center East-West line (b) at $t = 12$ $ms$. }
+
+\subsection{Field Example: Mt. Milligan VTEM data}
+In 2007 a  VTEM survey was flown over the Mt. Millgian deposit as part of QUEST project intiated by Geoscience of BC. A location map as well as soundings along a profile are shown in Figure ~\ref{fig:field_back}. Note the strong negative transients near 800 $m$ distance. The data were inverted in 3D by \cite{yang20143} and the recovered conductivity model is shown in 3D (Figure ~\ref{fig:field_back}c). The conductivity inversion omitted some stations/time channels where the measured responses showed strong negative transients.  By using this 3D conductivity model, which is $\sigma_{est}$, we computed $d^{IP}$ data using equation (\ref{eq14}). In Figure ~\ref{fig:field_ch2}, we present observed data ($EMIP$), predicted data ($EM$) from 3D ATEM inversion and $d^{IP}$ data. Here we put white and black dashed circles to emphasize five $d^{IP}$ anomalies (A1-A5); white and black colors of those differentiate between locations where negative transients were observed in the raw data (A1-A3), and where transients are noted after EM coupling removal (A4 and A5). Observed data at $t$ = 4.7 $ms$ show that we cannot see any negative transients at the locations near A1-A3 anomalies (left panel of Figure~\ref{fig:field_ch2}(a)), whereas those at $t$ = 7.2 $ms$ (left panel of Figure~\ref{fig:field_ch2}(b)) show negative transients near these locations. However, by subtracting $EM$ responses predicted by 3D ATEM inversion, we can clearly recognize A1-A3 anomalies even at $t$  = 4.7 $ms$ as shown in right panel of Figure~\ref{fig:field_ch2}. Furthermore, we can identfiy A4 and A5 anomalies,which we could not identify even in a relatively late time channel ($t$ = 7.2 $ms$) of the observed data.
+
+The next step is to account for inexact knowledge about the background conductivity. For each time channel we estimated a regional by fitting the observed data with a low order polynomial and then subtracted this regional from $d^{IP}$. This is made easier by the observation that the IP response for the coincident loop system should be negative.  The $d^{IP}$ data, the estimated regional, and the corrected data at $t = 7.2$ $ms$ are shown in Figure ~\ref{fig:field_regional}.
+
+The final step is to carry out the inversion. At the top of the horizontal slice in Figure ~\ref{fig:field_inv}, we present corrected $d^{IP}$ responses at  $t = 7.2$ $ms$ and below that we present recovered pseudo-chargeability ($\bar{\eta}$) section at three different depth estimated from our linear inversion. In this figure, we can recognize that anomalous $d^{IP}$ responses are reasonably mapped in the 3D space and we also observe the changes of anomalous $\bar{\eta}$ bodies in depth.
+Five anomalies are identified. Anomalies at A2 and A3 exhibited negative values at mid to late times and hence would have been identified as locations of chargeable material. Anomalies at A4 and A5 were not associated with negatives and are observed only because of the decoupling process. We also notice a difference in the inverted IP bodies. Bodies near A1 and A5 anomalies appears to be shallow and dies out quickly with depth. Anomalous body near A3 and A4 increases in strength and then decays with depth.
+
+\plot{field_back}{width=0.8\columnwidth}
+{Geographic location of Mt. Millgan (a). Profile of negative transients observed in a VTEM survey at the Mt. Milligan deposit in British Columbia (b). Estimated background conductivity model ($\sigma_{est}$) from 3D ATEM inversion \cite[]{yang20143} (c)}
+
+\plot{field_ch2}{width=1.0\columnwidth}
+{Observed (left panel), predicted (middle panel), $d^{IP}$ (right panel) data from 3D ATEM inversion of Mt. Milligan VTEM data at $t=4.7$ (a) and $t=7.2$ $ms$ (b). Solid dots indicate sounding and dashed circles contour five $d^{IP}$ anomalies (A1-A5). Black and white colors of dashed circles differentiate two different types of $d^{IP}$ anomalies.}
+
+\plot{field_regional}{width=0.9\columnwidth}
+{(a) $d^{IP}$ responses computed by the subtraction of predicted ATEM responses3D ATEM inversion of Mt. Milligan VTEM data at $t=7.2$ $ms$ from observed responses. Estimated regional (b) and corrected $d^{IP}_{corr}$ (b)responses based on equation (\ref{eq8}).}
+
+\section{Conclusions}
+In this study we have developed a procedure to extract IP information from ATEM data. The processing involves estimating a background conductivity, removal of EM coupling, estimating a possible residual field caused by incorrect knowledge of the conducitivity and carrying out a linearized inversion to recover a pseudo-chargeability. The inversion can be done at each time channel and the results further analysed to extract intrinsic estimates of the Cole-Cole parameters. We recognize that there are significant assumptions that have gone into generating our algorithm, principally the need to evaluate the background conductivity and the assumption that we can generate a residual field that can be removed from the data. These are issues for further research. Nevertheless, the success we have had in applying the technique to the Mt. Milligan data is encouraging.
+
+\plot{field_inv}{width=0.45\textwidth, height=0.36\textheight}
+{Corrected $d^{IP}$ by regional removal at $t=4.7$ $ms$ and horizontal slices for the distribution of recovered pseudo chargeability model at depths -20, -40 and -60 m.}
+
+% \section{Acknowledgement}
+% ...
+
+
+
+\twocolumn
+\onecolumn
+% \append{The source of the bibliography}
+% \verbatiminput{example.bib}
+\bibliographystyle{seg}  % style file is seg.bst
+\bibliography{example}
+
+\end{document}

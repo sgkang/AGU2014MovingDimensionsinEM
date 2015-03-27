@@ -1,0 +1,50 @@
+This is BibTeX, Version 0.99d (TeX Live 2014)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: SEG2015_MovingDims.aux
+The style file: seg.bst
+Database file #1: example.bib
+Warning--entry type for "SimPEGEM" isn't style-file defined
+--line 78 of file example.bib
+Warning--empty publisher in MikeParam2014
+You've used 7 entries,
+            2639 wiz_defined-function locations,
+            748 strings with 7667 characters,
+and the built_in function-call counts, 3057 in all, are:
+= -- 328
+> -- 145
+< -- 3
++ -- 50
+- -- 50
+* -- 263
+:= -- 528
+add.period$ -- 7
+call.type$ -- 7
+change.case$ -- 60
+chr.to.int$ -- 7
+cite$ -- 8
+duplicate$ -- 103
+empty$ -- 197
+format.name$ -- 59
+if$ -- 621
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 7
+newline$ -- 25
+num.names$ -- 21
+pop$ -- 58
+preamble$ -- 1
+purify$ -- 60
+quote$ -- 0
+skip$ -- 82
+stack$ -- 0
+substring$ -- 211
+swap$ -- 14
+text.length$ -- 1
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 40
+warning$ -- 1
+while$ -- 23
+width$ -- 0
+write$ -- 76
+(There were 2 warnings)
