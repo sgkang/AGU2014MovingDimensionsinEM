@@ -1,5 +1,5 @@
 \documentclass{segabs}
-\usepackage{mathrsfs,amsmath,url}
+\usepackage{mathrsfs,amsmath,url,xspace}
 
 
 % An example of defining macros
@@ -94,6 +94,13 @@
 \newcommand{\dip}{d^{IP}}
 \newcommand{\sigpert}{\delta\sigma}
 
+
+\newcommand{\SimPEG}{\textsc{SimPEG}\xspace}
+\newcommand{\simpegEM}{\textsc{simpegEM}\xspace}
+
+
+
+
 \begin{document}
 
 \title{Moving between dimensions in electromagnetic inversions}
@@ -112,23 +119,50 @@ Electromagnetic (EM) methods are used to characterize the electrical conductivit
 \end{abstract}
 \renewcommand{\figdir}{Fig} % figure directory
 % In this presentation, we will share examples as well as our experience from creating a range of simulation and inversion tools for EM methods that span dimensions (1D, 2D and 3D). The flexibility and consistency in our EM package allows us to be methodical so that we have the capacity to tackle a spectrum of problems in EM geophysics.
-% This is the motivation behind the open source software package SimPEG-EM which is part of a software ecosystem for Simulation and Parameter Estimation in Geophysics (SimPEG).
+% This is the motivation behind the open source software package \simpegEM which is part of a software ecosystem for Simulation and Parameter Estimation in Geophysics (\SimPEG).
 \section{Introduction}
-Using electromagentic (EM) wave, we excites the earth and measure signals from the earth. This signal includes conductivity distribution of the earth. By solving Maxwell's equations, we can compute forward response of the system with known conductivity distribution.
-Using the EM inversion technique, we recover a conductivity model, which explains the measured EM response.
+Using electromagentic (EM) wave, we excites the earth and measure signals from the earth.
+This signal includes conductivity distribution of the earth. By solving Maxwell's
+equations, we can compute forward response of the system with known conductivity
+distribution.
+Using the EM inversion technique, we recover a conductivity model, which explains the
+measured EM response.
 This model can be discretized voxel of the 3D conductivity.
-To proceed this 3D inversion, we need to compute forward response from the 3D earth. Therefore a natural choice of the inversion model can be 3D distribution of the conductivity.
-Recently, 3D EM inversion technique using gradient based optimiztion has actively been developed and interrogated on various applications (\cite{Doug2013,Gribenko2007,Chung2014}).
+To proceed this 3D inversion, we need to compute forward response from the 3D earth.
+Therefore a natural choice of the inversion model can be 3D distribution of the conductivity.
+Recently, 3D EM inversion technique using gradient based optimiztion has actively been
+developed and interrogated on various applications (\cite{Doug2013,Gribenko2007,Chung2014}).
 
-The gradient based geophysical inversion technique includes several pieces in general: uncertainty, data misfit, sensitivity, model and regularization. Our focus in this paper is the inversion model.
+The gradient based geophysical inversion technique includes several pieces in general:
+uncertainty, data misfit, sensitivity, model and regularization.
+Our focus in this paper is the inversion model.
 In most cases, the inversion model has been considered as 3D distribution of the conductivity.
-However, our model can be more general. For example, let us assume we have 3D conductivity model for sewatuer intrusion as shown in Figure ~\ref{fig:mapping123D}. Although physical property model can be in 3D, inversion model can be either 1D or 2D as shown in Figure ~\ref{fig:mapping123D}. Realization of this is possilble using model mapping function, which can be defined as
+However, our model can be more general. For example, let us assume we have 3D conductivity
+model for sewatuer intrusion as shown in Figure ~\ref{fig:mapping123D}.
+Although physical property model can be in 3D, inversion model can be either 1D or 2D
+as shown in Figure ~\ref{fig:mapping123D}.
+Realization of this is possible using model mapping function, which can be defined as
 \begin{equation}
   \sigma  = \mathcal{M}[m],
 \end{equation}
-where $\sigma$ is the electrical conductivity (S/m). This mapping function ($\mathcal{M}[\cdot]$) transforms the space from the inversion model to physical property model. Moving our spatial dimensions from 1D to 3D or 2D to 3D can be possible using this mapping function. On top of that, we can use a geometric function like sphere or ellipsoid to parameterize 3D structure with few parameters (\cite{MikeParam2014}). Implementation of this is done through SimPEG-EM which is part of a software ecosystem for Simulation and Parameter Estimation in Geophysics (SimPEG; \cite{SimPEG}). SimPEG-EM provides forward and inverse problem of EM methods in both frequency and time domain (\cite{SimPEGEM}).
+where $\sigma$ is the electrical conductivity (S/m). This mapping function
+($\mathcal{M}[\cdot]$) transforms the space from the inversion model to physical property
+model. Moving our spatial dimensions from 1D to 3D or 2D to 3D can be possible using this
+mapping function. On top of that, we can use a geometric function like sphere or
+ellipsoid to parameterize 3D structure with few parameters (\cite{MikeParam2014}).
+Implementation of this is done through \simpegEM which is part of a software ecosystem
+for Simulation and Parameter Estimation in Geophysics (\SimPEG; \cite{SimPEG}).
+\simpegEM provides forward and inverse problem of EM methods in both frequency and time domain (\cite{SimPEGEM}).
 
-In this study, we exploit seawater intrusion problem with ground loop EM survey to visit suite of model spaces that we can use in the EM inversion. We use time domain EM (TEM) methods. To setup a survey design, we use 1D seawater intrusion model and perform feasibility test. Based on this, we compute forward response from 3D seawater intrusion model. 1D stitched and 2D inversion to a line profile data are going to be applied to resotre 2D conductivity model. Using multiple line profile data, we perform 3D EM inversion to restore 3D conductivity model. Based on the knowledge from 1D 2D and 3D inversion, parameterization of seawater intrusion model with arbitrary geometric function is possible, and this may allow us to answer specialized question like ``where is the interface between seawater and freshwater''.
+In this study, we exploit seawater intrusion problem with ground loop EM survey to visit
+suite of model spaces that we can use in the EM inversion. We use time domain EM (TEM)
+methods. To setup a survey design, we use 1D seawater intrusion model and perform feasibility test. Based on this, we compute forward response from 3D seawater intrusion
+model. 1D stitched and 2D inversion to a line profile data are going to be applied to
+restore the 2D conductivity model. Using multiple line profile data, we perform 3D EM
+inversion to restore 3D conductivity model. Based on the knowledge from 1D 2D and 3D inversion, parameterization of seawater intrusion model with arbitrary geometric function
+is possible, and this may allow us to answer specialized question like ``where is the
+interface between seawater and freshwater''.
+
 
 \plot{mapping123D}{width=0.8\columnwidth}
 {Conceptual diagram of 1D, 2D and 3D models for the seawater intrusion problem.}
@@ -230,7 +264,7 @@ Using mapping function in our geophysical inversion, we decoupled inversion mode
 
 
 \section{Acknowledgement}
-Thank you for Klara Steklova for helpful discussion about hydrological problem and  SimPEG developers. Generating 3D distribution of seawater intrusion model was performed using GIFtools.
+Thank you for Klara Steklova for helpful discussion about hydrological problem and  \SimPEG developers. Generating 3D distribution of seawater intrusion model was performed using GIFtools.
 
 \twocolumn
 \onecolumn
