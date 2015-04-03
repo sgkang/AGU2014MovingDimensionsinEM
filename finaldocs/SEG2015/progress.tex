@@ -119,9 +119,7 @@ Electromagnetic (EM) methods are used to characterize the electrical conductivit
 \end{abstract}
 \renewcommand{\figdir}{Fig} % figure directory
 
-\vspace{-15pt}
 \section{Introduction}
-\vspace{-7pt}
 Electromagnetic (EM) fields and fluxes can be used to excite the earth, and in a geophysical survey, we measure and interpret the resulting signals. These signals are sensitive to the conductivity distribution of the earth. By numerically solving Maxwell's equations, we can compute the forward response for a system with a known conductivity distribution. To conduct a forward simulation for a 3D conductivity distribution, we require the property to be discretized numerically, and we typically employ a voxel-based mesh to discretize the earth. Once we have a mechanism to simulate EM fields and fluxes, we can consider approaching the inverse problem. The aim of an EM inversion is to recover a model that is consistent with the measured EM data and prior knowledge of the geologic setting.
 
 Three dimensional EM inversion techniques using gradient-based optimization have been actively developed and applied for various survey types and geologic settings  (\cite{Doug2013, Gribenko2007, Chung2014}). A gradient based inversion approach requires defining an objective function that will be minimized in the optimization. Equally important, yet often overlooked, is the definition of the model over which we minimize. Our focus in this paper is the construction of this inversion model in a flexible framework.
@@ -142,7 +140,6 @@ In this study, we select a seawater intrusion model and use a ground loop time d
 {Conceptual diagram of moving between 1D, 2D, and 3D models.}
 
 \section*{Methodology}
-\vspace{-7pt}
 In the EM inversion, we attempt to recover a model which explains measured response and is consistent with our prior knowledge. The EM response is governed by Maxwell's equations and depends upon the electrical conductivity ($\sigma$), which is a physical property distributed in 3D space: $\sigma = \sigma(x, y, z)$. We excite the earth using a time-varying current, $\j_s$, and measure EM response at receiver locations. By discretizing Maxwell's equations, we can numerically compute the forward response. This operation can be succinctly written as
 \begin{equation}
   d^{pred} = F[\sigma],
@@ -189,7 +186,6 @@ Application to a 2D map is identical to equation~\ref{eq:combomap2} except that 
 {A graphical illustration of the combined map shown in equation (\ref{eq:combomap2}), which transforms (a) 1D logarithmic conductivity values in the subsurface, to (b) a vertical 1D model to (c) a 3D conductivity distribution through a vertical 1D map and an exponential.}
 
 \section*{Seawater intrusion example}
-\vspace{-7pt}
 In some coastal area, seawater intrusion is a serious problem due to the resulting contamination of groundwater (Figure \ref{fig:concept}). The location and distribution of the seawater intrusion is a key piece of information to any management decisions taken to assess or address the threat of seawater intrusion. Ground loop EM surveys have been used to detect intruded seawater, because seawater is highly conductive (\cite{Mills1988}). Figure \ref{fig:concept} shows a typical ground loop TEM survey geometry and a hydrological model of the coastal area. By putting time-varying current through the transmitter loop, we excite the earth. The 3D conductivity model shown in Figure \ref{fig:sigtrue} shows the true distribution of the seawater intrusion. Geophysics can be used as a tool to locate the possible region where we have serious seawater intrusion. As such, recovering the conductivity distribution, which has high correlation with the seawater intrusion is a principal task. More specifically, the interface between freshwater and seawater is crucial information.
 
 \plot{concept}{width=0.8\columnwidth}
@@ -220,16 +216,15 @@ To consider multi-dimensional effect from intruded seawater, we increase the dim
 {Comparisons of observed and predicted data for 1D and 2D inversions. }
 
 \subsection*{3D inversion}
-In reality, the distribution of intruded seawater is in 3D, thus restoration of the 3D conductivity model is an important task in order to characterize the regions that are affected by seawater intrusion. For the previous 1D and 2D inversions, we used a subset of the total data. However, for a 3D inversion, it is crucial to have measurements that are not solely collected in the center line of the loop to have reasonable sensitivity to the 3D volume. We used all receivers shown in Figure~\ref{fig:geometry}. Using the mapping function shown in equation \ref{eq:combomap1}, we perform a 3D EM inversion. Figure~\ref{fig:3DinvTD} shows plan and section views of the recovered conductivity model from the 3D inversion. The interface of the seawater intrusion is nicely imaged in both horizontal and vertical directions. A visualization of the 3D recovered volume of conductivity distribution is shown in Figure~\ref{fig:final}.
+In reality, the distribution of intruded seawater is in 3D, thus restoration of the 3D conductivity model is an important task in order to characterize the regions that are affected by seawater intrusion. For the previous 1D and 2D inversions, we used a subset of the total data. However, for a 3D inversion, it is crucial to have measurements that are not solely collected in the center line of the loop to have reasonable sensitivity to the 3D volume. We used all receivers shown in Figure~\ref{fig:geometry}. Using the mapping function shown in equation \ref{eq:combomap1}, we perform a 3D EM inversion. Figure~\ref{fig:3DinvTD} shows plan and section views of the recovered conductivity model from the 3D inversion. The interface of the seawater intrusion is nicely imaged in both horizontal and vertical directions. A visualization of the 3D recovered volume of conductivity distribution is shown in Figure~\ref{fig:final}. There is good agreement of the predicted data to the observed data, as shown in Figure~\ref{fig:3Dobspred}.
 
 \plot{3DinvTD}{width=1.0\columnwidth}
 {Plan and section views of recovered conductivity from 3D EM inversion.}
 
-% \plot{3Dobspred}{width=0.9\columnwidth}
-% {A comparison of observed and predicted response of Tx loop 1 shown in Figure~\ref{fig:geometry}.}
+\plot{3Dobspred}{width=0.9\columnwidth}
+{A comparison of observed and predicted response of Tx loop 1 shown in Figure~\ref{fig:geometry}.}
 
 \section*{Conclusions}
-\vspace{-7pt}
 By using the presented mapping methodology in our geophysical inversion, we separate the inversion model space from the physical property space. This allows us flexibility in selecting a definition of an inversion model. The mapping serves as a link between the two spaces. Our inversion model may be defined in one, two, or three dimensions, and through the mapping, the 3D physical property distribution associated with this model is constructed. Data can then be simulated over this physical property distribution, and the model agreement with the observed data evaluated.
 
 We demonstrated this concept for three different inversion models with different dimensionalities: 1D, 2D, and 3D. Using a mapping, we performed TDEM inversions for an example seawater intrusion problem. We focused our discussion on considering model spaces having differing dimensionalities, which is a small subset of the possible parameterizations available. Another option is to consider parametric mapping functions in which we seek to find a geometric shape or boundary with a small number of model parameters. These parameterizations will allow targeted questions to be asked of the inversion using the mapping methodology described here \emph{without} changing the EM simulation and inversion `machinery'. This separation of the inversion model space from the physical property space is a powerful concept, as it allows us to tailor our choice of model space to the geologic setting, survey design and goals of the inversion.
@@ -239,8 +234,7 @@ We demonstrated this concept for three different inversion models with different
 {Cut-off 3D volume of true and recovered conductivity distribution of seawater intrusion.}
 
 \section{Acknowledgement}
-\vspace{-7pt}
-Thanks to Klara Steklova for helpful discussion about hydrological problem, Eldad Haber for discussions on computational electromagnetics, and \SimPEG developers. Generating the 3D seawater intrusion model was performed using GIFtools.
+Thanks to Klara Steklova for helpful discussion about hydrological problem and  \SimPEG developers. Generating the 3D seawater intrusion model was performed using GIFtools.
 
 \twocolumn
 \onecolumn
